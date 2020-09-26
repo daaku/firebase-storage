@@ -29,6 +29,18 @@ export interface FirebaseStorageMetadata {
   downloadTokens: string;
 }
 
+// The in-progress state of an upload.
+export interface FirebaseUploadState {
+  uploadURL: string;
+  granularity: number;
+  offset: number;
+}
+
+// Indicates the type of result when uploading chunks.
+export type FirebaseUploadChunkResult =
+  | { type: 'continue'; state: FirebaseUploadState }
+  | { type: 'finish'; metadata: FirebaseStorageMetadata };
+
 // TokenSource is invoked for each API call to find if a token is available for
 // Authorization. It should handle caching and refreshing it internally.
 export interface FirebaseTokenSource {
@@ -77,11 +89,12 @@ export class FirebaseStorageClient {
     return await fetch(request);
   }
 
-  public async upload(
+  // Start the upload process.
+  public async uploadStart(
     path: string,
     blob: Blob,
     metadata: FirebaseUploadMetadata = {},
-  ): Promise<FirebaseStorageMetadata> {
+  ): Promise<FirebaseUploadState> {
     const res = await this.fetch(this.url(path), {
       method: 'post',
       body: JSON.stringify({
@@ -97,29 +110,59 @@ export class FirebaseStorageClient {
         'X-Goog-Upload-Header-Content-Type': metadata.contentType ?? blob.type,
       },
     });
+    return {
+      uploadURL: res.headers.get('x-goog-upload-url')!,
+      granularity: parseInt(
+        res.headers.get('x-goog-upload-chunk-granularity')!,
+        10,
+      ),
+      offset: 0,
+    };
+  }
 
-    const uploadURL = res.headers.get('x-goog-upload-url')!;
-    const granularity = parseInt(
-      res.headers.get('x-goog-upload-chunk-granularity')!,
-      10,
-    );
+  // Upload a chunk and return the new state or final metadata.
+  public async uploadChunk(
+    state: FirebaseUploadState,
+    blob: Blob,
+  ): Promise<FirebaseUploadChunkResult> {
+    const chunk = blob.slice(state.offset, state.offset + state.granularity);
+    const isLastChunk = chunk.size < state.granularity;
+    const res = await this.fetch(state.uploadURL, {
+      method: 'post',
+      headers: {
+        'X-Goog-Upload-Offset': state.offset.toString(),
+        'X-Goog-Upload-Command': isLastChunk ? 'upload, finalize' : 'upload',
+      },
+      body: chunk,
+    });
+    if (isLastChunk) {
+      return {
+        type: 'finish',
+        metadata: await res.json(),
+      };
+    }
+    return {
+      type: 'continue',
+      state: {
+        ...state,
+        offset: state.offset + chunk.size,
+      },
+    };
+  }
 
-    let offset = 0;
+  // Start an upload, send all the cunks and finalize it.
+  public async upload(
+    path: string,
+    blob: Blob,
+    metadata: FirebaseUploadMetadata = {},
+  ): Promise<FirebaseStorageMetadata> {
+    let state = await this.uploadStart(path, blob, metadata);
     while (true) {
-      const chunk = blob.slice(offset, offset + granularity);
-      const isLastChunk = chunk.size < granularity;
-      const res = await this.fetch(uploadURL, {
-        method: 'post',
-        headers: {
-          'X-Goog-Upload-Offset': offset.toString(),
-          'X-Goog-Upload-Command': isLastChunk ? 'upload, finalize' : 'upload',
-        },
-        body: chunk,
-      });
-      if (isLastChunk) {
-        return await res.json();
+      const result = await this.uploadChunk(state, blob);
+      if (result.type === 'finish') {
+        return result.metadata;
       }
-      offset += chunk.size;
+      state = result.state;
     }
   }
 
