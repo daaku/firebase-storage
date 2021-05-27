@@ -111,8 +111,12 @@ export class FirebaseStorageClient {
       },
     });
     return {
+      // expect this to be in the response
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       uploadURL: res.headers.get('x-goog-upload-url')!,
       granularity: parseInt(
+        // expect this to be in the response
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         res.headers.get('x-goog-upload-chunk-granularity')!,
         10,
       ),
@@ -157,6 +161,7 @@ export class FirebaseStorageClient {
     metadata: FirebaseUploadMetadata = {},
   ): Promise<FirebaseStorageMetadata> {
     let state = await this.uploadStart(path, blob, metadata);
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const result = await this.uploadChunk(state, blob);
       if (result.type === 'finish') {
