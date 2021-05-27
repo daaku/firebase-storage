@@ -161,7 +161,6 @@ export class FirebaseStorageClient {
     metadata: FirebaseUploadMetadata = {},
   ): Promise<FirebaseStorageMetadata> {
     let state = await this.uploadStart(path, blob, metadata);
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const result = await this.uploadChunk(state, blob);
       if (result.type === 'finish') {
