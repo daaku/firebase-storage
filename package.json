@@ -1,7 +1,7 @@
 {
   "name": "@daaku/firebase-storage",
   "author": "Naitik Shah <n@daaku.org>",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Minimal wrapper to upload files to Firebase Storage.",
   "repository": "git@github.com:daaku/firebase-storage",
   "main": "dist/src/index.js",
