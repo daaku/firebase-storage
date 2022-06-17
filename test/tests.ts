@@ -1,7 +1,7 @@
 import { Auth } from '@daaku/firebase-auth';
 import { nanoid } from 'nanoid';
 
-import { FirebaseStorageClient } from '../src';
+import { FirebaseStorageClient } from '../src/index.js';
 
 async function makeClient(): Promise<[Auth, FirebaseStorageClient]> {
   const auth = await Auth.new({
