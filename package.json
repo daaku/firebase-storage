@@ -20,7 +20,7 @@
   "keywords": ["firebase", "api"],
   "devDependencies": {
     "@daaku/firebase-auth": "^2.2.0",
-    "@daaku/qunit-puppeteer": "^3.0.0",
+    "@daaku/qunit-puppeteer": "^4.0.0",
     "@types/qunit": "^2.11.2",
     "esbuild": "^0.20.0",
     "nanoid": "^5.0.1",
