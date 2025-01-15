@@ -2,6 +2,5 @@
 /dist/bundle
 /dist/test
 /.github
-/src
 /test
 /tsconfig.json
