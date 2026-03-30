@@ -7,6 +7,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strictBindCallApply": true,
-    "target": "esnext"
+    "target": "esnext",
+    "types": ["qunit"]
   }
 }

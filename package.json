@@ -10,20 +10,13 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
-    }
+    ".": { "import": "./dist/src/index.js", "types": "./dist/src/index.d.ts" }
   },
   "scripts": {
-    "build": "tsc",
-    "test": "esbuild --bundle --sourcemap --outdir=dist/bundle test/tests.ts && TIMEOUT=30000 qunit-puppeteer",
-    "deploy": "npm run build && npm publish --access=public"
+    "prepare": "tsc",
+    "test": "esbuild --bundle --sourcemap --outdir=dist/bundle test/tests.ts && TIMEOUT=30000 qunit-puppeteer"
   },
-  "keywords": [
-    "firebase",
-    "api"
-  ],
+  "keywords": ["firebase", "api"],
   "devDependencies": {
     "@daaku/firebase-auth": "^2.7.0",
     "@daaku/qunit-puppeteer": "^4.1.0",
