@@ -21,7 +21,7 @@
     "@daaku/firebase-auth": "^2.7.0",
     "@daaku/qunit-puppeteer": "^4.1.0",
     "@types/qunit": "^2.19.13",
-    "esbuild": "^0.27.4",
+    "esbuild": "^0.28.0",
     "nanoid": "^5.1.7",
     "qunit": "^2.25.0",
     "typescript": "^6.0.2"
