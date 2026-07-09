@@ -24,6 +24,6 @@
     "esbuild": "^0.28.0",
     "nanoid": "^5.1.7",
     "qunit": "^2.25.0",
-    "typescript": "^6.0.2"
+    "typescript": "^7.0.2"
   }
 }
